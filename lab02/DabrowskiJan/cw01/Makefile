@@ -1,20 +1,46 @@
+CFLAGS= -g -Wall
 
-.PHONY: clean
+.PHONY: all clean_static clean_dynamic clean_shared clean_libraries
 
-time: time.c
-	gcc -c copy.c
-	gcc -c copy_block.c
-	ar rcs libcopy.a copy.o
-	ar rcs libcopy_block.a copy_block.o
+all: static shared dynamic
 
-	gcc -g -Wall time.c libcopy.a libcopy_block.a -o time
+static: main_static.c
+	gcc -c collatz_library.c
+	ar rcs libcollatz_library.a collatz_library.o
 
-time_test: time.c
-	make time
-	make clean
-	./time
-	nano ./results/pomiar_zad_2.txt
+	gcc $(CFLAGS) main_static.c libcollatz_library.a -o main_stat
 
-clean: 
-	rm copy.o libcopy.a copy_block.o libcopy_block.a
+shared: main_static.c 
+	gcc -fPIC -c collatz_library.c
+	gcc -shared collatz_library.o -o libcollatz_library.so
+
+	gcc $(CFLAGS) main_static.c -L. -lcollatz_library -Wl,-rpath=. -o main_shared
+
+dynamic: main_dynamic.c
+	gcc -fPIC -c collatz_library.c
+	gcc -shared collatz_library.o -o libcollatz_library.so
+
+	gcc $(CFLAGS) main_dynamic.c -o main_dynamic -ldl
+
+clean_static:
+	rm main_stat libcollatz_library.a collatz_library.o
+
+clean_shared:
+	rm main_shared libcollatz_library.so collatz_library.o
+
+clean_dynamic:
+	rm main_dynamic libcollatz_library.so collatz_library.o
+
+clean_libraries:
+	rm libcollatz_library.a collatz_library.o libcollatz_library.so
+
+clean:
+	rm main_stat libcollatz_library.a collatz_library.o main_shared libcollatz_library.so main_dynamic
+
+test:
+	./main_stat
+	./main_dynamic
+	./main_shared
+
+
 
