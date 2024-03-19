@@ -18,3 +18,6 @@ time_test: time.c
 clean: 
 	rm copy.o libcopy.a copy_block.o libcopy_block.a
 
+clean_results:
+	rm ./results/reversed_block.txt ./results/reversed_copy.txt ./results/pomiar_zad_2.txt time
+

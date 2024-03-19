@@ -4,25 +4,40 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char* reverse(char* block, int size);
+void reverse(char* block, int size);
 
 int copy_block() {
     char block[1024];
     int inputFile, outputFile;
     int byteRead;
+    off_t fileSize;
 
     inputFile = open("./texts/text_copy_block.txt", O_RDONLY);
-    outputFile = open("./results/reversed_block.txt", O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+    outputFile = open("./results/reversed_block.txt", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 
     if (inputFile == -1) {
         printf("Error with input file!");
         return 1;
     }
 
-    while ((byteRead = read(inputFile, block, sizeof(block))) > 0) {
-        char *reversedBlock = reverse(block, byteRead);
-        write(outputFile, reversedBlock, byteRead);
-        free(reversedBlock); // Free dynamically allocated memory
+    fileSize = lseek(inputFile, 0, SEEK_END); 
+    off_t currentPosition = fileSize; 
+
+    while (currentPosition > 0) {
+        off_t offset = currentPosition - sizeof(block);
+        if (offset < 0) {
+            lseek(inputFile, 0, SEEK_SET);
+            read(inputFile, block, currentPosition);
+            reverse(block, currentPosition);
+            write(outputFile, block, currentPosition);
+            break;
+        } else {
+            lseek(inputFile, offset, SEEK_SET); 
+            byteRead = read(inputFile, block, sizeof(block)); 
+            reverse(block, byteRead); 
+            write(outputFile, block, byteRead); 
+            currentPosition -= byteRead; 
+        }
     }
 
     close(inputFile);
@@ -31,18 +46,13 @@ int copy_block() {
     return 0;
 }
 
-char* reverse(char* block, int size) {
-    char* output = (char*)malloc(size); // Allocate memory for the reversed string
-
-    if (output == NULL) {
-        // Handle memory allocation failure
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(EXIT_FAILURE);
+void reverse(char* block, int size) {
+    int i, j;
+    char temp;
+    for (i = 0, j = size - 1; i < j; i++, j--) {
+        temp = block[i];
+        block[i] = block[j];
+        block[j] = temp;
     }
-
-    for (int i = 0; i < size; i++) {
-        output[i] = block[size - i - 1];
-    }
-
-    return output;
 }
+
