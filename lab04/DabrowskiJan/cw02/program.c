@@ -23,22 +23,22 @@ int main(int argc, char *argv[]) {
         global++;
         local++;
         printf("child process: child pid = %d, parent pid = %d\n", getpid(), getppid());
-        printf("child process: child's local = %d, child's global = %d\n", local, global);
+        printf("child's local = %d, child's global = %d\n", local, global);
         execl("/bin/ls", "ls", argv[1], NULL);
         
         perror("execl");
         return 1;
-    } else {  // Parent process
-        printf("parent process: parent process\n");
-        printf("parent process: parent pid = %d, child pid = %d\n", getpid(), pid);
-        int status;
-        waitpid(pid, &status, 0);
-        if (WIFEXITED(status)) {
-            printf("Child exit code: %d\n", WEXITSTATUS(status));
-        } else {
-            printf("Child process did not terminate normally\n");
-        }
-        printf("Parent's local = %d, parent's global = %d\n", local, global);
-        return 0;
+    } 
+    int status;
+    waitpid(pid, &status, 0);
+    if (WIFEXITED(status)) {
+        printf("Child exit code: %d\n", WEXITSTATUS(status));
+    } else {
+        printf("Child process did not terminate normally\n");
     }
+    printf("parent process\n");
+    printf("parent process: parent pid = %d, child pid = %d\n", getpid(), pid);
+    printf("Parent's local = %d, parent's global = %d\n", local, global);
+    return 0;
+
 }

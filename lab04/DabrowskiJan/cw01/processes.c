@@ -19,7 +19,6 @@ void process(int processes) {
         }
     }
 
-    // Wait for all child processes to finish
     int status;
     for (int i = 0; i < processes; i++) {
         if (wait(&status) == -1) {
