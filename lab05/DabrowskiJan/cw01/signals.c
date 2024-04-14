@@ -19,8 +19,6 @@ void check_pending(int sig) {
 }
 
 int main(int argc, char *argv[]) {
-    printf("huh\n");
-
     if (argc != 2) {
         printf("Usage: %s <none|ignore|handler|mask>\n", argv[0]);
         return 1;

@@ -2,6 +2,8 @@
 
 results/
 
+exam/
+
 *.o
 
 *.a
@@ -12,3 +14,4 @@ results/
 
 *.json
 
+*.txt
